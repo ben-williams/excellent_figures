@@ -50,16 +50,16 @@ library(ggplot2)
 ggplot(mtcars, aes(wt, mpg))+geom_point()
 @
 
-We get a gray background with small black dots, white grid lines, and a font that is not particularly legible when the figure is placed in this document (Figure~\ref{fig:clear}a). Most journals require a figure to be 300 dpi or greater not to mention the background should be white, without grid lines, and with a font that is consistent with the rest of the manuscript. Lets address these step by step.
+We get a gray background with small black dots, white grid lines, and a font that is not particularly legible when the figure is placed in this document (Figure 1a). Most journals require a figure to be 300 dpi or greater not to mention the background should be white, without grid lines, and with a font that is consistent with the rest of the manuscript. Lets address these step by step.
 \subsection{White background}
-Want a white background? We've got that. Simply add a \textit{theme} to the figure (Figure~\ref{fig:clear}b).
+Want a white background? We've got that. Simply add a \textit{theme} to the figure (Figure 1b).
 
 <<wht,fig.height=4, fig.width=4,eval=FALSE>>=
 ggplot(mtcars, aes(wt, mpg))+geom_point()+theme_bw()
 @
 
 \subsection{Remove grid lines}
-To remove grid lines add another \textit{theme} (Figure~\ref{fig:clear}c).
+To remove grid lines add another \textit{theme} (Figure 1c).
 
 <<grid,fig.height=4, fig.width=4,eval=FALSE>>=
 ggplot(mtcars, aes(wt, mpg))+geom_point()+theme_bw()+
@@ -70,7 +70,7 @@ ggplot(mtcars, aes(wt, mpg))+geom_point()+theme_bw()+
 \begin{figure}[H]
 	\centering
 	\begin{subfigure}[b]{0.49\textwidth}
-		<<base0, fig.align='left',echo=FALSE>>=
+		<<base0, fig.align='left',echo=FALSE, dpi=300, dev='png'>>=
 library(ggplot2)
 ggplot(mtcars, aes(wt, mpg))+geom_point()
 @
@@ -79,7 +79,7 @@ ggplot(mtcars, aes(wt, mpg))+geom_point()
 	~ %add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc.
 	%(or a blank line to force the subfigure onto a new line)
 	\begin{subfigure}[b]{0.49\textwidth}
-   	<<base1, fig.align='left',echo=FALSE>>=
+   	<<base1, fig.align='left',echo=FALSE, dpi=300, dev='png'>>=
 ggplot(mtcars, aes(wt, mpg))+geom_point()+theme_bw()
 @
 \caption{White background}
@@ -87,7 +87,7 @@ ggplot(mtcars, aes(wt, mpg))+geom_point()+theme_bw()
 	~ %add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc.
 	%(or a blank line to force the subfigure onto a new line)
 	\begin{subfigure}[b]{0.49\textwidth}
-      <<base2, fig.align='center',echo=FALSE>>=
+      <<base2, fig.align='center',echo=FALSE, dpi=300, dev='png'>>=
 ggplot(mtcars, aes(wt, mpg))+geom_point()+theme_bw()+
   theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank())
 @
@@ -102,7 +102,7 @@ ggplot(mtcars, aes(wt, mpg))+geom_point()+theme_bw()+
 Fonts are both easy and not so easy to deal with depending on what your needs are. In this case we want a Times New Roman 12 pt font. The 12 pt is easy so let's start with that.
 
 Simply add a base\_size option in theme\_bw() as seen in (Figure~2a). 
-<<font, out.width=".49\\textwidth",fig.align='center',fig.cap="Font change first try",fig.pos='H', eval=FALSE>>=
+<<font, out.width=".49\\textwidth",fig.align='center',fig.cap="Font change first try",fig.pos='H', eval=FALSE, dpi=300, dev='png'>>=
 ggplot(mtcars, aes(wt, mpg)) + geom_point() +
   theme_bw(base_size=12) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
@@ -121,7 +121,7 @@ ggsave("figure2b.png", dpi=300, height=4, width=4, units="in")
 \begin{figure}[H]
    \centering
 	\begin{subfigure}[b]{0.49\textwidth}
-<<font0, fig.align='left',echo=FALSE,dev='png'>>=
+<<font0, fig.align='left',echo=FALSE,, dpi=300, dev='png'>>=
 library(ggplot2)
 ggplot(mtcars, aes(wt, mpg))+geom_point()+
   theme_bw(base_size=12)+
@@ -144,9 +144,9 @@ ggplot(mtcars, aes(wt, mpg))+geom_point()+
 
 
 
-Our figure is looking ok, but the font is not correct. I'm on a Windows machine, so these procedures may be different for other operating systems. R is not terribly great at fonts so it is necessary to define the fonts clearly. This involves loading the \textit{extrafont} package. then importing and unpacking the fonts. \textit{Note: Only font\_import one time, it takes a while and once done you are good to go}. 
+Our figure is looking ok, but the font is not correct. I'm on a Windows machine, so these procedures may be different for other operating systems. R is not terribly great at fonts so it is necessary to define the fonts clearly. This involves loading the \textit{extrafont} package, then importing and unpacking the fonts. \textit{Note: Only font\_import one time, it takes a while and once done you are good to go, I have it commented out as I've already run it}. 
 
-<<fontfake, message=FALSE, warning=FALSE,  eval=FALSE>>=
+<<fontfake, message=FALSE, warning=FALSE,  eval=FALSE, dpi=300, dev='png'>>=
 library(extrafont)
 #font_import()
 loadfonts(device="win")
@@ -174,13 +174,10 @@ ggplot(mtcars, aes(wt, mpg))+geom_point()+
   theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank())
 @
 
-
-
-
 \subsection{A better way: theme\_set()}
 While all these adjustments to ggplot are great, there is a much better way for defining all of your ggfigures. It goes by the name \textit{theme\_set}. Here is a working example.
 
-<<update,warning=FALSE,error=FALSE,message=FALSE,dev='png'>>=
+<<update,warning=FALSE,error=FALSE,message=FALSE,dev='png',dpi=300>>=
 library(extrafont);library(ggplot2)
 #font_import() only do this one time - it takes a while
 loadfonts(device="win")
@@ -194,7 +191,6 @@ With the basic figure options set, less time is spent coding figures and more ti
 <<themeset,fig.pos='H',fig.height=4, dpi=300, fig.width=4, eval=FALSE>>=
 ggplot(mtcars, aes(wt, mpg))+geom_point()
 @
-
 
 \section{Smoothers}
 Lets explore these data, starting with a smooth. the base smooth for ggplot is ``loess" (Figure~4a) for data groups \textless1000 and a ``gam" for groups \textgreater1000 (Figure~4b).
@@ -224,8 +220,8 @@ ggplot(mtcars, aes(wt, mpg))+geom_point()+geom_smooth(method='gam', formula=y~s(
 \end{figure}
 
 
-
 That is great and all but most of us do not use loess on a regular basis. However we can also implement other model structures (Figure~\ref{fig:multi}). In this case we added a linear regression (\textit{lm}) and generalized linear regression with a polynomial (\textit{glm}), a generalized additive model with knots (\textit{k}) set at 5, and a non-linear least squares model. \textit{Note that the polynomial in the glm smooth could also be done via the \textit{lm} smooth (also with the poly function instead of the identity component), however I'm mostly showing that their is a \textit{glm} function that can be assigned different distributions (e.g., family=``binomial"), same goes for the \textit{gam} smoother. More info can be found here \url{http://www.ats.ucla.edu/stat/r/faq/smooths.htm}. Other good things can be found on that site as well}.
+\clearpage
 <<multi, message=FALSE,warning=FALSE,error=FALSE, fig.height=4,fig.width=4, fig.align='center', fig.cap='Multiple smoothers.',dev='png',dpi=300>>=
 ggplot(mtcars, aes(wt, mpg))+geom_point()+
   geom_smooth(alpha=.1)+geom_smooth(method='lm',alpha=.1, color=2, fill=2,)+ 
@@ -241,28 +237,28 @@ ggplot(mtcars, aes(wt, mpg))+geom_point()+
 \section{Plot options}
 \subsection{Point size \& color}
 Want bigger points, no problem simply change the size in geom\_point() (Figure~\ref{fig:point}). Jitter using geom\_jitter(), etc.
-<<point, message=FALSE,warning=FALSE,error=FALSE, fig.height=4,fig.width=4, fig.align='center', fig.cap='Point size.',dev='png' ,dpi=300, fig.pos='H'>>=
+<<point, message=FALSE,warning=FALSE,error=FALSE, fig.height=3.9,fig.width=4, fig.align='center', fig.cap='Point size.',dev='png' ,dpi=300, fig.pos='H'>>=
 ggplot(mtcars, aes(wt, mpg))+geom_point(size=4)+geom_smooth(alpha=.1)
 @
 
 
-However, if you want the points to be different colors this can be added to the aesthetic component (in either the ggplot() or geom\_point() component). For example lets change the size of the points by a car's horsepower (hp) a continuous variable in the dataframe. 
+However, if you want the points to be different colors this can be added to the aesthetic component (in either the ggplot() or geom\_point() component). For example lets change the size of the points by a car's horsepower (hp) a continuous variable in the dataframe (Figure~\ref{fig:color}. 
 
-<<color, message=FALSE,warning=FALSE,error=FALSE, fig.height=4,fig.width=4, fig.align='center', fig.cap='Multiple smoothers.',dev='png',dpi=300, fig.pos='H'>>=
+<<color, message=FALSE,warning=FALSE,error=FALSE, fig.height=3.9,fig.width=4, fig.align='center', fig.cap='Multiple smoothers.',dev='png',dpi=300, fig.pos='H'>>=
 ggplot(mtcars, aes(wt, mpg))+geom_point(aes(size=hp, color=hp))+
   geom_smooth(alpha=.1)
 @
 
-Now the colors and sizes could be determined by changing hp to a factor.
-<<eval=FALSE>>=
+Now the colors and sizes could be determined by changing hp to a factor (Figure 8a).
+<<eval=FALSE, dpi=300, dev='png'>>=
 ggplot(mtcars, aes(wt, mpg))+geom_point(aes(size=factor(hp), color=factor(hp)))+
   geom_smooth(alpha=.1)
 
 @
 
-However this will often create too many discrete groups to clearly understand what is being plotted, therefore a ``better" method is to define the scales for the data points. This can be done with scale\_color\_gradientn().
+However this will often create too many discrete groups to clearly understand what is being plotted, therefore a ``better" method is to define the scales for the data points. This can be done with scale\_color\_gradientn() (Figure~8b).
 
-<<eval=FALSE>>=
+<<eval=FALSE, dpi=300, dev='png'>>=
 ggplot(mtcars, aes(wt, mpg))+geom_point(aes(size=hp, color=hp))+
   geom_smooth(alpha=.1)+
   scale_colour_gradientn(colours=rainbow(5))+
@@ -274,137 +270,84 @@ ggplot(mtcars, aes(wt, mpg))+geom_point(aes(size=hp, color=hp))+
 	~ %add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc.
 	%(or a blank line to force the subfigure onto a new line)
 	\begin{subfigure}[b]{0.45\textwidth}
-<<echo=FALSE, fig.height=4,fig.width=4, fig.align='center', fig.cap='Multiple smoothers.',dev='png',dpi=300, fig.pos='H'>>=
+<<echo=FALSE, fig.height=4,fig.width=4, fig.align='center', fig.cap='Multiple smoothers.',dev='png',dpi=300, fig.pos='H',cache=TRUE>>=
 ggplot(mtcars, aes(wt, mpg))+geom_point(aes(size=factor(hp), color=factor(hp)))+
   geom_smooth(alpha=.1)
-
 @
 		\label{fig:f10}
 	\end{subfigure}
 	~ %add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc.
 	%(or a blank line to force the subfigure onto a new line)
 	\begin{subfigure}[b]{0.45\textwidth}
-<<echo=FALSE, fig.height=4,fig.width=4, fig.align='center', fig.cap='Multiple smoothers.',dev='png',dpi=300, fig.pos='H'>>=
-
+<<echo=FALSE, fig.height=4,fig.width=4, fig.align='center', fig.cap='Multiple smoothers.',dev='png',dpi=300, fig.pos='H',cache=TRUE>>=
 ggplot(mtcars, aes(wt, mpg))+geom_point(aes(size=hp, color=hp))+
   geom_smooth(alpha=.1)+
   scale_colour_gradientn(colours=rainbow(5))+
   scale_size(range=c(0,7))
-  
 @
 		\label{fig:f11}
 	\end{subfigure}
 	\caption{Adding smoothers (modeling).}\label{fig:font}
 \end{figure}
-@
-\end{document}
 
+\clearpage
+Want to define where the legend breaks? no problem, just add a vector of values (Figure~\ref{fig:break}).
 
-Want to define where the breaks are, no problem, just add a vector of values.
-\begin{lstlisting}
+<<break,eval=TRUE, fig.height=4,fig.width=4, fig.align='center', fig.cap='Multiple smoothers.',dev='png',dpi=300, fig.pos='H',cache=TRUE>>=
+
 bs <- seq(0,350,25)
 ggplot(mtcars, aes(wt, mpg))+geom_point(aes(size=hp, color=hp))+
   geom_smooth(alpha=.1)+
   scale_colour_gradientn(colours=rainbow(5), breaks=as.vector(bs))+
   scale_size(range=c(0,7),breaks=as.vector(bs))
-        
-ggsave("f12.png", height=4, width=5, units="in")
-\end{lstlisting}
+@
 
-Note that the legend now falls off the plotted area for the figure.
+Note that the legend now falls off the plotted area for the figure. One way to fix this is to remove one of the legends, in this case the legend that references the size of the points (Figure~\ref{fig:combine}).
 
-One way to fix this is to remove one of the legends, in this case the legend that references the size of the points.
-
-\begin{lstlisting}
+<<combine,echo=TRUE, fig.height=4,fig.width=4, fig.align='center', fig.cap='Combine legends.',dev='png',dpi=300, fig.pos='H'>>=
 ggplot(mtcars, aes(wt, mpg))+geom_point(aes(size=hp, color=hp))+
   geom_smooth(alpha=.1)+
   scale_colour_gradientn(colours=rainbow(5), breaks=as.vector(bs))+
   scale_size(range=c(0,7), breaks=as.vector(bs),guide = FALSE)
+@
 
-ggsave("f13.png", height=4, width=5, units="in")
-\end{lstlisting}
-\begin{figure}[H]
-	\centering
-	~ %add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc.
-	%(or a blank line to force the subfigure onto a new line)
-	\begin{subfigure}[b]{0.45\textwidth}
-		\includegraphics[width=\textwidth]{f12}
-		\caption{Adding a loess smoother.}
-		\label{fig:f12}
-	\end{subfigure}
-	~ %add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc.
-	%(or a blank line to force the subfigure onto a new line)
-	\begin{subfigure}[b]{0.45\textwidth}
-		\includegraphics[width=1\textwidth]{f13}
-		\caption{Multiple smoothers.}
-		\label{fig:f13}
-	\end{subfigure}
-	\caption{Adding smoothers (modeling).}\label{fig:font}
-\end{figure}
+
+The legend now breaks in increments of 25 using a 5 color scale from the rainbow.
 
 \subsection{Axis tickmarks}
 
-It is quite easy to change the axis tick marks. Change the y-axis to every 5th value (Figure~\ref{fig:f14}).
-\begin{lstlisting}
+It is quite easy to change the axis tick marks. Change the y-axis to every 5th value (Figure~\ref{fig:tick}).
+<<tick,echo=TRUE, fig.height=4,fig.width=4, fig.align='center', fig.cap='Change y-axis tick marks.',dev='png',dpi=300, fig.pos='H'>>=
 ggplot(mtcars, aes(wt, mpg))+geom_point(aes(size=hp, color=hp))+
   geom_smooth(alpha=.1)+
   scale_colour_gradientn(colours=rainbow(5), breaks=as.vector(bs))+
   scale_size(range=c(0,7), breaks=as.vector(bs),guide = FALSE)+
   scale_y_continuous(breaks= seq(0,40,5))
-        
-ggsave("f14.png", height=4, width=5, units="in")
-\end{lstlisting}
+@
 
 
-Also change the x-axis, this time to unequal spacings (Figure~\ref{fig:f15}).
-\begin{lstlisting}
+Also change the x-axis, this time to unequal spacings (Figure~\ref{fig:tick2}).
+<<tick2,echo=TRUE, fig.height=4,fig.width=4, fig.align='center', fig.cap='Change y-axis and x-axis tick marks.',dev='png',dpi=300, fig.pos='H'>>=
 ggplot(mtcars, aes(wt, mpg))+geom_point(aes(size=hp, color=hp))+
   geom_smooth(alpha=.1)+
   scale_colour_gradientn(colours=rainbow(5), breaks=as.vector(bs))+
   scale_size(range=c(0,7), breaks=as.vector(bs),guide = FALSE)+
   scale_y_continuous(breaks= seq(0,40,5))+
   scale_x_continuous(breaks= c(0,1,1.5,2,3,5))
+@
 
-ggsave("f15.png", height=4, width=5, units="in")
-\end{lstlisting}
-\pagebreak
-
-Change the labels while keeping the tickmarks (Figure~\ref{fig:f16}).
-\begin{lstlisting}
+Change the labels while keeping the tickmarks (Figure~\ref{fig:tick3}).
+<<tick3,echo=TRUE, fig.height=4,fig.width=4, fig.align='center', fig.cap='Change y-axis and x-axis tick marks.',dev='png',dpi=300, fig.pos='H'>>=
 ggplot(mtcars, aes(wt, mpg))+geom_point(aes(size=hp, color=hp))+
   geom_smooth(alpha=.1)+
   scale_colour_gradientn(colours=rainbow(5), breaks=as.vector(bs))+
   scale_size(range=c(0,7), breaks=as.vector(bs),guide = FALSE)+
-  scale_y_continuous(breaks= seq(0,40,5))+
-  scale_x_continuous(breaks= c(0,1,1.5,2,3,5))
+  scale_y_continuous(breaks= seq(0,40,5), labels=c(0,"",10,"",20,"",30,"",40))+
+  scale_x_continuous(breaks= seq(0,5,.5), labels=c(seq(0,2,.5),"","",3.5, "",4.5,""))
+@
 
-ggsave("f16.png", height=4, width=5, units="in")
-\end{lstlisting}
-\begin{figure}[H]
-	\centering
-	\begin{subfigure}[b]{0.45\textwidth}
-		\includegraphics[width=\textwidth]{f14}
-		\caption{y-axis labels changed.}
-		\label{fig:f14}
-	\end{subfigure}%
-	~ %add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc.
-	%(or a blank line to force the subfigure onto a new line)
-	\begin{subfigure}[b]{0.45\textwidth}
-		\includegraphics[width=\textwidth]{f15}
-		\caption{adjust x-axis labels and tick marks.}
-		\label{fig:f15}
-	\end{subfigure}
-	~ %add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc.
-	%(or a blank line to force the subfigure onto a new line)
-	\begin{subfigure}[b]{0.45\textwidth}
-		\includegraphics[width=\textwidth]{f16}
-		\caption{change the scale using xlim() and ylim().}
-		\label{fig:f16}
-	\end{subfigure}
-	\caption{Adjusting axis tick marks and labels.}\label{fig:clear}
-\end{figure}
 However, the scale presented doesn't include zero, something that is often nice to have. The standard way to do this is to use xlim()and/or ylim().
-\begin{lstlisting}
+<<zero,echo=FALSE, fig.height=4,fig.width=4, fig.align='center', fig.cap='Change y-axis and x-axis tick marks.',dev='png',dpi=300, fig.pos='H'>>=
 ggplot(mtcars, aes(wt, mpg))+geom_point(aes(size=hp, color=hp))+
   geom_smooth(alpha=.1)+
   scale_colour_gradientn(colours=rainbow(5), breaks=as.vector(bs))+
@@ -412,13 +355,9 @@ ggplot(mtcars, aes(wt, mpg))+geom_point(aes(size=hp, color=hp))+
   scale_y_continuous(breaks= seq(0,40,5), labels=c(0,"",10,"",20,"",30,"",40))+
   scale_x_continuous(breaks= seq(0,5,.5), labels=c(seq(0,2,.5),"","",3.5, "",4.5,""))+
   xlim(0,5)+ylim(0,40)
-
-ggsave("f16.png", height=4, width=5, units="in")
-\end{lstlisting}
-
-
+@
 A number of things have now changed, (1) the scales have reverted back to their original designations, (2) zero is now included on both axes, and (3) we have cut off data by constraining the axis at 5. One function of ggplot is that it only evaluates the data that is in the figure pane. So any smooths, etc., are informed only by the data that is seen. This can be changed to include the data in any smooth, but allow the figure to be ``zoomed in" on an area of interest. To do this we use coord\_cartesian() .
-\begin{lstlisting}
+<<cartesian,echo=FALSE, fig.height=3.9,fig.width=4, fig.align='center', fig.cap='Combine legends.',dev='png',dpi=300, fig.pos='H'>>=
 ggplot(mtcars, aes(wt, mpg))+ 
   geom_point(aes(size=hp, color=hp))+
   geom_smooth(alpha=.1)+
@@ -427,18 +366,10 @@ ggplot(mtcars, aes(wt, mpg))+
   scale_y_continuous(breaks= seq(0,40,5), labels=c(0,"",10,"",20,"",30,"",40))+
   scale_x_continuous(breaks= seq(0,5,.5), labels=c(seq(0,2,.5),"","",3.5, "",4.5,""))+
   coord_cartesian(xlim=c(0,5),ylim=c(0,40))
-
-ggsave("f17.png", height=4, width=5, units="in")
-\end{lstlisting}
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=.7\linewidth]{f17}
-	\caption{}
-	\label{fig:f17}
-\end{figure}
+@
 
 The smooth now extends to the end of the pane as it indeed includes the values that are off the page. The points can be brought back into the figure by changing the x-axis limits.
-\begin{lstlisting}
+<<xlimchange,echo=FALSE, fig.height=3.9,fig.width=4, fig.align='center', fig.cap='Combine legends.',dev='png',dpi=300, fig.pos='H'>>=
 ggplot(mtcars, aes(wt, mpg))+
   geom_point(aes(size=hp, color=hp))+
   geom_smooth(alpha=.1)+
@@ -447,13 +378,6 @@ ggplot(mtcars, aes(wt, mpg))+
   scale_y_continuous(breaks= seq(0,40,5), labels=c(0,"",10,"",20,"",30,"",40))+
   scale_x_continuous(breaks= seq(0,5,.5), labels=c(seq(0,2,.5),"","",3.5, "",4.5,""))+
   coord_cartesian(xlim=c(0,5.5),ylim=c(0,40))
+@
 
-ggsave("f18.png", height=4, width=5, units="in")
-\end{lstlisting}
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=1\linewidth]{f18}
-	\caption{}
-	\label{fig:f18}
-\end{figure}
-%\end{multicols}
+\end{document}
