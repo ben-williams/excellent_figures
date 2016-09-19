@@ -1,0 +1,443 @@
+---
+title: "Most excellent figures in R with ggplot2"
+author: "Ben Williams"
+date: "February 21, 2016"
+output: 
+   html_document:
+    toc: true
+    toc_depth: 2
+    theme: cerulean
+    fig_caption: true
+---
+```{r, echo=F}
+knitr::opts_chunk$set(warning = F, message=F, error=F)
+```
+#1 Short version  
+Set up the R work environment to produce publication quality documents using ggplot.  Use theme\_set to define the base figure elements - in this case: no gridlines, a white background, and 12 pt times new roman font.
+
+Load packages
+```{r theme_short, eval=F}
+library(extrafont)
+#font_import() only do this one time - it takes a while
+loadfonts(device="win")
+windowsFonts(Times=windowsFont("TT Times New Roman"))
+
+library(ggplot2)
+theme_set(theme_bw(base_size=12,base_family='Times New Roman')+ 
+  theme(panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank()))
+```
+
+Use ggsave to increase dpi from base R level (72 dpi) and to defining figure dimensions.
+```{r, eval=F}
+ggplot(data, aes(x=x, y=y))+geom_point()
+ggsave("filename.png", dpi=300, height=4, width=5, units="in")
+```
+
+#2 Basics  
+##2.1 ggplot base figures    
+You say you want to create a publication quality figure using ggplot? Well then, you are in the right place!  
+First, let's look at what ggplot produces as a base graphic. We will use the R built in data set *mtcars*.
+
+```{r base,eval=TRUE,fig.align='center',fig.cap="Figure 1. Base plot." }
+library(ggplot2)
+ggplot(mtcars, aes(wt, mpg))+geom_point()
+```
+
+We get a gray background with small black dots, white grid lines, and a font that is not particularly legible when the figure is placed in this document. Most journals require a figure to be 300 dpi or greater not to mention the background should be white, without grid lines, and with a font that is consistent with the rest of the manuscript. Lets address these step by step.
+
+##2.2 White background  
+Want a white background? We've got that. Simply add a *theme* to the figure. In this case we will add *theme_bw()*.  
+
+```{r white, eval=TRUE,fig.align='center',fig.cap="Figure 1b. White background."}
+ggplot(mtcars, aes(wt, mpg))+geom_point()+theme_bw()
+```
+
+##2.3 Remove grid lines  
+To remove gridlines add another *theme*, and use element_blank() to clear the lines.  
+```{r grids, eval=TRUE,fig.align='center',fig.cap="Figure 1c. White background, no gridlines."}
+ggplot(mtcars, aes(wt, mpg))+geom_point()+
+   theme_bw()+
+   theme(panel.grid.major = element_blank(),
+         panel.grid.minor = element_blank())
+```
+
+##2.4 Fonts and resolution  
+Fonts are both easy and not so easy to deal with depending on what your needs are.  
+In this case we want a Times New Roman 12 pt font. The 12 pt is easy so let's start with that.
+Simply add a base size option in theme bw()  
+```{r font,eval=TRUE,fig.align='center',fig.cap="Fig 2. White background, no gridlines, plus a font size change."}
+ggplot(mtcars, aes(wt, mpg))+geom_point()+
+   theme_bw(base_size = 12)+
+   theme(panel.grid.major = element_blank(),
+         panel.grid.minor = element_blank())
+```
+
+Hey nothing happened, Figure 2 is the same as Figure 1c?  
+The reason for this is the file size. These figures would be saved as .png and R has a base figure
+output of 72 ppi. This resolution is too low for journal submissions so let's up it. In this case I'm
+outputting a .png file with a set width and height and a resolution of 300. 
+```{r save1, echo=F, dpi=300,fig.align='center',fig.cap="Fig 2b. Changed font size and resolution."}
+ggplot(mtcars, aes(wt, mpg))+geom_point()+
+   theme_bw(base_size = 12)+
+   theme(panel.grid.major = element_blank(),
+         panel.grid.minor = element_blank())
+```
+
+In order to save the figure we will use ggsave. (Note the size increase of Figure 2b is due to presenting this on the web at 300 dpi - the ggsave function shown below will save a figure in a specified format at a chosen resolution and size).   
+```{r save, eval=F}
+ggsave("figure2b.png", dpi=300, dev='png', height=4, width=5, units="in")
+```
+
+Our figure is looking ok, but the font is not correct if you wanted *Time New Roman*. I'm on a Windows machine, so these
+procedures may be different for other operating systems. R is not terribly great at fonts so it is
+necessary to define the fonts clearly. This involves loading the *extrafont* package, then importing
+and unpacking the fonts. *Note: Only font import one time, it takes a while and once done you are
+good to go, I have it commented out as I've already run it.*
+
+```{r fontfake, message=FALSE, warning=FALSE,  eval=TRUE}
+library(extrafont)
+#font_import()
+loadfonts(device="win")
+``` 
+
+Load the fonts for a windows device and define the font for windows.
+```{r loadwin, message=FALSE, warning=FALSE,  eval=TRUE}
+windowsFonts(Times=windowsFont("TT Times New Roman"))
+```
+
+Now the font can be incorporated into the figure via the theme\_bw() component (Figure 3).
+```{r fig3, eval=T, dpi=300,fig.align='center',fig.cap="Fig 3. 12 pt Time New Roman font figure."}
+ggplot(mtcars, aes(wt, mpg))+geom_point()+
+  theme_bw(base_size=12,base_family='Times New Roman')+ 
+  theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank())
+```
+
+##2.5 A better way: theme_set()
+
+While all these adjustments to ggplot are great, there is a much better way for defining all of your
+ggfigures. It goes by the name theme set. Here is a working example.
+
+First load the fonts
+```{r, eval=F}
+library(extrafont);library(ggplot2)
+#font_import() only do this one time - it takes a while
+loadfonts(device="win")
+windowsFonts(Times=windowsFont("TT Times New Roman"))
+```
+
+then use theme_set to determine the desired font and figure parameters.
+```{r}
+theme_set(theme_bw(base_size=12,base_family='Times New Roman')+
+             theme(panel.grid.major = element_blank(), 
+                   panel.grid.minor = element_blank()))
+```
+
+With the basic figure options set, less time is spent coding figures and more time can be spent
+exploring data. The code used to produce Figure 3 is now reduced to:
+
+```{r, eval=F}
+ggplot(mtcars, aes(wt, mpg))+geom_point()
+```
+
+#3 Exploratory data analysis (very brief)  
+##3.1 Smoothers  
+
+Lets explore these data, starting with a smooth. the base smooth for ggplot is *loess* (Figure 4)
+for data groups <1000 and a *gam* for groups >1000.
+```{r, message=FALSE, eval=T,fig.align='center', fig.cap="Fig 4. Loess smoother."}
+ggplot(mtcars, aes(wt, mpg))+geom_point()+geom_smooth()
+```
+
+That is great and all but most of us do not use *loess* on a regular basis. However we can also
+implement other model structures (Figure 5).  
+
+In this case we added a linear regression (lm) and generalized linear regression with a polynomial (glm), a generalized additive model with knots (k) set at 5, and a non-linear least squares model. *Note that the polynomial in the glm smooth could also be done via the lm smooth (also with the poly function instead of the identity component)*,   
+however I'm mostly showing that their is a glm function that can be assigned different distributions
+(e.g., family="binomial"), same goes for the gam smoother. 
+
+More info can be found here http://www.ats.ucla.edu/stat/r/faq/smooths.htm. Other good things can be found on that site
+as well.
+
+```{r, message=FALSE, eval=T,fig.align='center', fig.cap="Fig 5. Multiple smoothers."}
+ggplot(mtcars, aes(wt, mpg))+geom_point()+
+   #loess smoother
+   geom_smooth(alpha=.1)+ 
+   #linear model
+   geom_smooth(method='lm',alpha=.1, color=2, fill=2)+ 
+   #generalized linear model
+   geom_smooth(method='glm', alpha=.1, color=3, fill=3, formula=y~x+I(x^2))+ 
+   #generalized additive model
+   geom_smooth(method='gam', alpha=.1, color=4, fill=4, formula=y~s(x, k=5))+ 
+   #non-linear least squares
+   geom_smooth(method = "nls", formula = y ~ a*x^2 + b*x +c,
+               method.args=list(start=list(a=.1,b=.5,c=.2)), se = FALSE, linetype = 1,
+               colour = 5, fill=5, alpha=.1)
+```
+
+#4. Plot options  
+##4.1 Point size & color  
+Want bigger points, no problem simply change the size in `geom_point()` (Figure ). Jitter using `geom_jitter()`, etc.
+
+```{r point, message=FALSE,warning=FALSE,error=FALSE,  fig.align='center', fig.cap='Figure 6. Point size.'}
+ggplot(mtcars, aes(wt, mpg))+geom_point(size=4)+geom_smooth(alpha=.1)
+```
+
+
+However, if you want the points to be different colors this can be added to the aesthetic component (in either the `ggplot()` or `geom_point()` component). For example lets change the size and color of the points by a car's horsepower (hp) a continuous variable in the dataframe. 
+
+```{r color, message=FALSE,warning=FALSE,error=FALSE, fig.align='center', fig.cap='Figure 7. Continuous horsepower for color and size.'}
+ggplot(mtcars, aes(wt, mpg))+geom_point(aes(size=hp, color=hp))+
+  geom_smooth(alpha=.1)
+```
+
+The colors and sizes could also be determined by changing hp to a factor.
+```{r, message=FALSE,warning=FALSE,error=FALSE, fig.align='center', fig.cap='Figure 8. Factored horse power for point color and size.'}
+ggplot(mtcars, aes(wt, mpg))+geom_point(aes(size=factor(hp), color=factor(hp)))+
+  geom_smooth(alpha=.1)
+```
+
+However this will often create too many discrete groups to clearly understand what is being plotted, therefore a "better" method is to define the scales for the data points. This can be done with `scale_color_gradientn()`.
+
+```{r, message=FALSE,warning=FALSE,error=FALSE, fig.align='center', fig.cap='Figure 9. Continuous horsepower color gradient.'}
+ggplot(mtcars, aes(wt, mpg))+geom_point(aes(size=hp, color=hp))+
+  geom_smooth(alpha=.1)+
+  scale_colour_gradientn(colours=rainbow(5))+
+  scale_size(range=c(0,7))
+```
+
+Want to define where the legend breaks? no problem, just add a vector of values.
+
+```{r, message=FALSE,warning=FALSE,error=FALSE, fig.align='center', fig.cap='Figure 10. Continuous horsepower color gradient with defined breaks.'}
+bs <- seq(0,350,25) # define break locations
+ggplot(mtcars, aes(wt, mpg))+geom_point(aes(size=hp, color=hp))+
+  geom_smooth(alpha=.1)+
+  scale_colour_gradientn(colours=rainbow(5), breaks=as.vector(bs))+
+  scale_size(range=c(0,7),breaks=as.vector(bs))
+```
+
+Note that the legend may fall off the plotted area of the figure. One way to fix this is to remove one of the legends, in this case the legend that references the size of the points.
+
+```{r, message=FALSE,warning=FALSE,error=FALSE, fig.align='center', fig.cap='Figure 11. Continuous horsepower color gradient with defined breaks and one legend removed.'}
+ggplot(mtcars, aes(wt, mpg))+geom_point(aes(size=hp, color=hp))+
+  geom_smooth(alpha=.1)+
+  scale_colour_gradientn(colours=rainbow(5), breaks=as.vector(bs))+
+  scale_size(range=c(0,7), breaks=as.vector(bs),guide = FALSE)
+```
+
+The legend now breaks in increments of 25 using a 5 color scale from the rainbow color palette.
+
+##4.2 Axis tickmarks  
+
+It is quite easy to change the axis tick marks. Change the y-axis to every 5th value.
+
+```{r tick,message=FALSE,warning=FALSE,error=FALSE, fig.align='center', fig.cap='Figure 12. Change y-axis tick marks.'}
+ggplot(mtcars, aes(wt, mpg))+geom_point(aes(size=hp, color=hp))+
+  geom_smooth(alpha=.1)+
+  scale_colour_gradientn(colours=rainbow(5), breaks=as.vector(bs))+
+  scale_size(range=c(0,7), breaks=as.vector(bs),guide = FALSE)+
+  scale_y_continuous(breaks= seq(0,40,5))
+```
+
+
+Also change the x-axis, this time to unequal spacings.
+```{r tick2,message=FALSE,warning=FALSE,error=FALSE, fig.align='center', fig.cap='Figure 13.Change y-axis and x-axis tick marks.'}
+ggplot(mtcars, aes(wt, mpg))+geom_point(aes(size=hp, color=hp))+
+  geom_smooth(alpha=.1)+
+  scale_colour_gradientn(colours=rainbow(5), breaks=as.vector(bs))+
+  scale_size(range=c(0,7), breaks=as.vector(bs),guide = FALSE)+
+  scale_y_continuous(breaks= seq(0,40,5))+
+  scale_x_continuous(breaks= c(0,1,1.5,2,3,5))
+```
+
+Your collaborator really prefers to have all of the tick marks present so... Change the labels while keeping the tickmarks.
+```{r tick3,message=FALSE,warning=FALSE,error=FALSE, fig.align='center', fig.cap='Figure 14.Change y-axis and x-axis tick marks.'}
+ggplot(mtcars, aes(wt, mpg))+geom_point(aes(size=hp, color=hp))+
+  geom_smooth(alpha=.1)+
+  scale_colour_gradientn(colours=rainbow(5), breaks=as.vector(bs))+
+  scale_size(range=c(0,7), breaks=as.vector(bs),guide = FALSE)+
+  scale_y_continuous(breaks= seq(0,40,5), labels=c(0,"",10,"",20,"",30,"",40))+
+  scale_x_continuous(breaks= seq(0,5,.5), labels=c(seq(0,2,.5),"","",3.5, "",4.5,""))
+```
+
+However, the scale presented doesn't include zero, something that is often nice to have. The standard way to do this is to use xlim() and/or ylim().
+```{r zero,echo=TRUE, fig.align='center', fig.cap='Figure 15. Change y-axis and x-axis tick marks.',warning=FALSE}
+ggplot(mtcars, aes(wt, mpg))+geom_point(aes(size=hp, color=hp))+
+  geom_smooth(alpha=.1)+
+  scale_colour_gradientn(colours=rainbow(5), breaks=as.vector(bs))+
+  scale_size(range=c(0,7), breaks=as.vector(bs),guide = FALSE)+
+  xlim(0,5)+ylim(0,40)
+```
+
+A number of things have now changed 
+
+   - (1) the scales have reverted back to their original designations, 
+   - (2) zero is now included on both axes, and 
+   - (3) we have cut off data by constraining the axis at 5. 
+
+One function of ggplot is that it only evaluates the data that is in the figure pane. So any smooths, etc., are informed only by the data that is seen. This can be changed to include the data that inform a smooth, but allow the figure to be "zoomed in" on an area of interest. To do this we use`coord_cartesian()`.
+
+```{r cartesian,echo=TRUE, fig.align='center', fig.cap='Figure 16. Using coord_cartesian to "zoom in".'}
+ggplot(mtcars, aes(wt, mpg))+ 
+  geom_point(aes(size=hp, color=hp))+
+  geom_smooth(alpha=.1)+
+  scale_colour_gradientn(colours=rainbow(5), breaks=as.vector(bs))+
+  scale_size(range=c(0,7), breaks=as.vector(bs),guide = FALSE)+
+  scale_y_continuous(breaks= seq(0,40,5), labels=c(0,"",10,"",20,"",30,"",40))+
+  scale_x_continuous(breaks= seq(0,5,.5), labels=c(seq(0,2,.5),"","",3.5, "",4.5,""))+
+  coord_cartesian(xlim=c(0,5),ylim=c(0,40))
+```
+
+The smooth now extends to the end of the pane as it indeed includes the values that are off the page. The points can be brought back into the figure by changing the x-axis limits.
+```{r xlimchange,echo=TRUE, fig.align='center', fig.cap='Figure 17. Include zero and show all data.'}
+ggplot(mtcars, aes(wt, mpg))+
+  geom_point(aes(size=hp, color=hp))+
+  geom_smooth(alpha=.1)+
+  scale_colour_gradientn(colours=rainbow(5), breaks=as.vector(bs))+
+  scale_size(range=c(0,7), breaks=as.vector(bs),guide = FALSE)+
+  scale_y_continuous(breaks= seq(0,40,5), labels=c(0,"",10,"",20,"",30,"",40))+
+  scale_x_continuous(breaks= seq(0,5,.5), labels=c(seq(0,2,.5),"","",3.5, "",4.5,""))+
+  coord_cartesian(xlim=c(0,5.5),ylim=c(0,40))
+```
+
+#5 Maps
+##5.1 Basic maps  
+
+There are a number of ways in R to plot maps and deal with raster images etc. I have
+no idea how to operate most of them. I do know a couple of easy ways to generate quick
+images though, they are presented below. The easiest method is to simply call a Google map
+location by name in ggmap. This needs an internet connection...
+For this example I have called for a map of the Bering Sea, with a zoom of "4"
+(zoom needs to be an integer from 3 (continent) to 21 (building); more info here).
+
+```{r map, fig.align='center', fig.cap='Figure 18. A map of the Bering Sea, pulled directly from Google Maps via ggmap.', warning=F, message=F}
+library(ggmap)
+bs <- get_map(location = "Bering Sea", zoom = 4)
+ggmap(bs)
+```
+
+##5.2 Cleaner maps  
+A map can be adjusted (centered) on a specific location (Figure 18), note that I changed
+the ``zoom" on this map and used the longitude and latitude to determine the center of the
+Figure. Points can be added easily, in the same manner as any other ggplot object.
+
+\emph{Note: For this example I simply made up some points to place in the general location and
+named them locs - you would have a separate dataframe with longitude and latitude positions
+in it.}
+
+First call the map.
+```{r ggmap1, message=FALSE, fig.height=4, fig.cap='Figure 19. A slightly zoomed in map of the Bering Sea, centered on specific coordinate locations.',dev='png',dpi=300, fig.pos='H',cache=F, warning=F}
+bs1<-get_map(location = c(-170,63), zoom = 6)
+ggmap(bs1)
+```
+
+Next add points to the map (Figure 19).
+```{r ggmap2, message=FALSE, fig.height=4, fig.cap='Figure 20 A slightly zoomed in map of the Bering Sea, centered on specific coordinate locations with randomly generated points overlayed.',dev='png',dpi=300, fig.pos='H', cache=F, warning=F}
+locs<-data.frame(long=c(-172,-173,-170,-170.5,-170.52),lat=c(62.1,62.2,62.3,63,65))
+
+ggmap(bs1)+geom_point(data=locs,aes(long,lat),size=5,color=4)
+```
+
+Polygons can be easily added in a manner similar to adding point locations. Here I've simply
+made a polygon from the made-up database (Figure 21). You would have a separate database
+holding the location for your polygon(s).
+
+```{r ggmap3,message=FALSE, fig.height=4, fig.cap='Figure 21. A slightly zoomed in map of the Bering Sea, centered on specific coordinate locations with a randomly generated polygon overlay.',dev='png',dpi=300, fig.pos='H',cache=F, warning=F}
+ggmap(bs1)+geom_point(data=locs,aes(long,lat),size=5,color=4)+
+    geom_polygon(aes(x = long, y = lat),data = locs,
+    colour = NA, fill = "red", alpha = .5)
+```  
+
+**Going deeper into the mapping realm  
+**(or the rabbit hole...)
+
+Mapping can get very confusing very quickly depending upon what exactly you want to do,
+how you want to present information, etc. I am focusing on a limited subset of mapping,
+mainly generating maps for quick visualization of data for evaluating spatial components.
+There is a great deal of information on mapping using ggmap be sure to have a look. That
+said sometimes you just want a shaded map or outline map minus the labels that are included
+with the Google maps. This can be done as well!
+Lets generate a map of the western Gulf of Alaska.
+
+```{r map1, fig.height=4, fig.cap="Figure 22. A map of Alaska, based on data from worldHires in the maps package."}
+library(ggplot2)
+library(maps)
+library(mapdata)
+library(mapproj)
+
+ak<-map_data('worldHires','USA:Alaska')
+ggplot()+geom_polygon(data=ak,aes(long,lat,group=group),fill=8,color="black")
+```
+
+
+Notice that this map doesn't seem quite right (Figure 22), there are two ways to deal
+with this one, if you don't need the far western Aleutian Islands you can simply constrain
+the plot (that is the method I will present); two, if you do need the Aleutian Islands then
+use "world2Hires" as opposed to 'worldHires' for the data source, this centers the map on
+the Pacific Ocean, but you will then have to deal with latitude and longitude adjustments
+(longitude is no longer negative $\leftarrow$ small rabbit hole).
+
+Lets return to the map we do want. There are two ways to constrain the data for the
+Aleutians (remove it, or simply constrain the limits of the plot). The first method here
+removes any points that are further west (east?) than 180$^o$. Then you can create a map
+with a light grey fill for the land and a black outline for the coast (Figure 23).
+
+```{r map2, message=FALSE, fig.height=5, fig.cap='Figure 23. ggplot2 map of Alaska based upon worldHires data.'}
+ak<-map_data('worldHires','USA:Alaska')
+ak<-subset(ak,long<0) #drop the end of the Aleutian Islands, or use world2Hires 
+akmap<-ggplot()+geom_polygon(data=ak,aes(long,lat,group=group),fill=8,color="black")
+akmap
+```
+
+
+Or we can simply constrain the data for the map if we are only interested in a particular
+area of Alaska. We can also clean the map up while zooming into a particular areas (Figure 24),
+in this case the western Gulf of Alaska. Note that the code to zoom in is not simply done by
+changing the x and y limits. When you constrain the x and y limits in ggplot it throws out
+any data outside of the image, therefore the polygon shapes ("groups") will not be complete
+and the image will not be pretty. In this plot I've incorporated the limits in
+a projection wrapper (coord\_map), there are a number of different projections
+that you can use though this will lead to a BIG rabbit hole!
+I've added a background color (aliceblue) as well as incorporated degree symbols into the
+x- and y-axis labels. Data points and polygons can now be added as additional layers as
+shown earlier.
+```{r map3, message=FALSE, fig.height=4, fig.cap='Figure 24. ggplot2 map of Alaska based upon worldHires data all dressed up with color.', fig.pos='H',dpi=300,dev='png'}
+ak<-map_data('worldHires','USA:Alaska')
+ggplot()+geom_polygon(data=ak,aes(long,lat,group=group),fill=8,color="black")+
+    theme(panel.background=element_rect(fill='aliceblue'))+
+    xlab(expression(paste(Longitude^o,~'W')))+
+    ylab(expression(paste(Latitude^o,~'N')))+
+    coord_map(xlim = c(-165, -145),ylim = c(54, 61))
+```
+
+ Figure 25 is the same map without color (better for reports, etc.).
+```{r map4,message=FALSE, fig.height=4, fig.cap='Figure 25. Zoomed in ggplot map of the western Gulf of Alaska based upon worldHires data.',dpi=300,dev='png', fig.pos='H'}
+ggplot()+geom_polygon(data=ak,aes(long,lat,group=group),fill=8,color='black') +
+   theme(panel.background=element_rect(fill='white')) + 
+   xlab(expression(paste(Longitude^o,~'W'))) +
+   ylab(expression(paste(Latitude^o,~'W')))+
+    coord_map(xlim = c(-165, -145),ylim = c(54, 61)) 
+```
+
+So you don't like the projection do you? Well change it using "+ coord_map()". There are loads of different projections that can be used, here I show "gilbert", but there are plenty more. Look at page 4 here for various types https://cran.r-project.org/web/packages/mapproj/mapproj.pdf. 
+
+```{r map5, message=FALSE, fig.height=5, fig.cap='Figure 26. ggplot2 map of Alaska based upon worldHires data. with different projections'}
+ak<-map_data('worldHires','USA:Alaska')
+ak<-subset(ak,long<0) #drop the end of the Aleutian Islands, or use world2Hires 
+akmap<-ggplot()+geom_polygon(data=ak,aes(long,lat,group=group),fill=8,color="black")
+akmap + coord_map("gilbert")
+```
+##5.3 Bathymetry - In progress...
+
+```{r, eval=F}
+library(marmap)
+
+#  Download data from the server
+getNOAA.bathy(lon1=-175,lon2=-156,lat1=53,lat2=66, resolution=1) -> AKBath
+#  Plot bathy data
+plot(AKBath, image=T,xlim=c(-175,-156), ylim=c(53,66),las=1)
+#  Ghetto low res AK map
+map('worldHires',fill=T,xlim=c(-175,-156), ylim=c(53,66),add=T, col=8)
+# Scale bar
+scaleBathy(AKBath, deg=2, x="topleft", inset=5)
+```
