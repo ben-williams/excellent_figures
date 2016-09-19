@@ -1,11 +1,10 @@
-Overhauled the .Rnw file (LaTeX) to a more user friendly .Rmd file (markdown).
-Code will be up shortly. The work in progress is available here
+The .Rmd file that creates this website
 http://ben-williams.github.io/updated_ggplot_figures.html
+is now available
 
 
 # excellent_figures
 creating excellent figures in ggplot
 
-Code for generating a pdf via knitr/sweave with RStudio
 
 If you find any errors or have additions that would improve this document please edit and submit a pull request!
