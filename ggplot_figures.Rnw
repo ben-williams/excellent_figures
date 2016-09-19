@@ -38,7 +38,7 @@ ggplot(data, aes(x=x, y=y))+geom_point()
 ggsave("filename.png", dpi=300, height=4, width=4, units="in")
 @
 
-\newpage
+
 %\begin{multicols}{2}
 \section{Basics}
 \subsection{ggplot base figure}
@@ -195,6 +195,7 @@ ggplot(mtcars, aes(wt, mpg))+geom_point()
 \section{Smoothers}
 Lets explore these data, starting with a smooth. the base smooth for ggplot is ``loess" (Figure~4a) for data groups \textless1000 and a ``gam" for groups \textgreater1000 (Figure~4b).
 <<message=FALSE, eval=FALSE>>=
+options(scipen=3)
 ggplot(mtcars, aes(wt, mpg))+geom_point()+geom_smooth()
 @
 \begin{figure}[H]
@@ -222,7 +223,7 @@ ggplot(mtcars, aes(wt, mpg))+geom_point()+geom_smooth(method='gam', formula=y~s(
 
 That is great and all but most of us do not use loess on a regular basis. However we can also implement other model structures (Figure~\ref{fig:multi}). In this case we added a linear regression (\textit{lm}) and generalized linear regression with a polynomial (\textit{glm}), a generalized additive model with knots (\textit{k}) set at 5, and a non-linear least squares model. \textit{Note that the polynomial in the glm smooth could also be done via the \textit{lm} smooth (also with the poly function instead of the identity component), however I'm mostly showing that their is a \textit{glm} function that can be assigned different distributions (e.g., family=``binomial"), same goes for the \textit{gam} smoother. More info can be found here \url{http://www.ats.ucla.edu/stat/r/faq/smooths.htm}. Other good things can be found on that site as well}.
 \clearpage
-<<multi, message=FALSE,warning=FALSE,error=FALSE, fig.height=4,fig.width=4, fig.align='center', fig.cap='Multiple smoothers.',dev='png',dpi=300>>=
+<<multi, message=FALSE,warning=FALSE,error=FALSE, fig.height=4,fig.width=4, fig.align='center', fig.cap='Multiple smoothers.',dev='png',dpi=300, fig.pos='H'>>=
 ggplot(mtcars, aes(wt, mpg))+geom_point()+
   geom_smooth(alpha=.1)+geom_smooth(method='lm',alpha=.1, color=2, fill=2,)+ 
   geom_smooth(method='glm', alpha=.1, color=3, fill=3, formula=y~x+I(x^2))+
@@ -355,8 +356,8 @@ ggplot(mtcars, aes(wt, mpg))+geom_point(aes(size=hp, color=hp))+
   scale_size(range=c(0,7), breaks=as.vector(bs),guide = FALSE)+
   xlim(0,5)+ylim(0,40)
 @
-A number of things have now changed (Figure~\ref{fig:zero}), (1) the scales have reverted back to their original designations, (2) zero is now included on both axes, and (3) we have cut off data by constraining the axis at 5. One function of ggplot is that it only evaluates the data that is in the figure pane. So any smooths, etc., are informed only by the data that is seen. This can be changed to include the data in any smooth, but allow the figure to be ``zoomed in" on an area of interest. To do this we use coord\_cartesian()  (Figure~\ref{fig:cartesian} .
-<<cartesian,echo=TRUE, fig.height=3.9,fig.width=4, fig.align='center', fig.cap='Combine legends.',dev='png',dpi=300, fig.pos='H'>>=
+A number of things have now changed (Figure~\ref{fig:zero}), (1) the scales have reverted back to their original designations, (2) zero is now included on both axes, and (3) we have cut off data by constraining the axis at 5. One function of ggplot is that it only evaluates the data that is in the figure pane. So any smooths, etc., are informed only by the data that is seen. This can be changed to include the data in any smooth, but allow the figure to be ``zoomed in" on an area of interest. To do this we use coord\_cartesian()  (Figure~\ref{fig:cartesian}) .
+<<cartesian,echo=TRUE, fig.height=3.9,fig.width=4, fig.align='center', fig.cap='Combine legends.',dev='png',dpi=300, fig.pos='H', fig.pos='H'>>=
 ggplot(mtcars, aes(wt, mpg))+ 
   geom_point(aes(size=hp, color=hp))+
   geom_smooth(alpha=.1)+
@@ -368,7 +369,7 @@ ggplot(mtcars, aes(wt, mpg))+
 @
 
 The smooth now extends to the end of the pane as it indeed includes the values that are off the page. The points can be brought back into the figure by changing the x-axis limits (Figure~\ref{fig:xlimchange}.
-<<xlimchange,echo=TRUE, fig.height=3.9,fig.width=4, fig.align='center', fig.cap='Combine legends.',dev='png',dpi=300, fig.pos='H'>>=
+<<xlimchange,echo=TRUE, fig.height=3.9,fig.width=4, fig.align='center', fig.cap='Combine legends.',dev='png',dpi=300, fig.pos='H', fig.pos='H'>>=
 ggplot(mtcars, aes(wt, mpg))+
   geom_point(aes(size=hp, color=hp))+
   geom_smooth(alpha=.1)+
@@ -378,19 +379,17 @@ ggplot(mtcars, aes(wt, mpg))+
   scale_x_continuous(breaks= seq(0,5,.5), labels=c(seq(0,2,.5),"","",3.5, "",4.5,""))+
   coord_cartesian(xlim=c(0,5.5),ylim=c(0,40))
 @
-\end{document}
 
-This section held in reserve
 \section{Maps}
 \subsection{Basic maps}
 There are a number of ways in R to plot maps and deal with raster images etc. I have
 no idea how to operate most of them. I do know a couple of easy ways to generate quick
 images though, they are presented below. The easiest method is to simply call a Google map
 location by name in ggmap. This needs an internet connection...
-For this example (Figure 1) I have called for a map of the Bering Sea, with a zoom of ``4"
+For this example (Figure~\ref{fig:ggmap}) I have called for a map of the Bering Sea, with a zoom of ``4"
 (zoom needs to be an integer from 3 (continent) to 21 (building); more info here).
 
-<<ggmap, message=FALSE, fig.height=4, fig.cap='A map of the Bering Sea, pulled directly from Google Maps via ggmap.'>>=
+<<ggmap, message=FALSE, fig.height=4, fig.cap='A map of the Bering Sea, pulled directly from Google Maps via ggmap.',dev='png',dpi=300, fig.pos='H'>>=
 library(ggmap)
 bs <- get_map(location = "Bering Sea", zoom = 4)
 ggmap(bs)
@@ -398,7 +397,7 @@ ggmap(bs)
 
 
 
-A map can be adjusted (centered) on a specific location (Figure 2), note that I changed
+A map can be adjusted (centered) on a specific location (Figure~\ref{fig:ggmap1}), note that I changed
 the ``zoom" on this map and used the longitude and latitude to determine the center of the
 Figure. Points can be added easily, in the same manner as any other ggplot object.
 
@@ -407,37 +406,32 @@ named them locs - you would have a separate dataframe with longitude and latitud
 in it.}
 
 First call the map.
-<<ggmap1, message=FALSE, fig.height=4, fig.cap='A map of the Bering Sea, pulled directly from Google Maps via ggmap.'>>=
+<<ggmap1, message=FALSE, fig.height=4, fig.cap='A slightly zoomed in map of the Bering Sea, centered on specific coordinate locations.',dev='png',dpi=300, fig.pos='H',cache=TRUE>>=
 bs1<-get_map(location = c(-170,63), zoom = 6)
 @
 
-Next add points to the map.
-<<ggmap2, message=FALSE, fig.height=4, fig.cap='A map of the Bering Sea, pulled directly from Google Maps via ggmap.'>>=
+Next add points to the map (Figure~\ref{fig:ggmap2}).
+<<ggmap2, message=FALSE, fig.height=4, fig.cap='A slightly zoomed in map of the Bering Sea, centered on specific coordinate locations with randomly generated points overlayed.',dev='png',dpi=300, fig.pos='H', cache=TRUE>>=
 locs<-data.frame(long=c(-172,-173,-170,-170.5,-170.52),lat=c(62.1,62.2,62.3,63,65))
 
 ggmap(bs1)+geom_point(data=locs,aes(long,lat),size=5,color=4)
 @
 
-Figure 2: A slightly zoomed in map of the Bering Sea, centered on specific coordinate
-locations.
 
 
 Polygons can be easily added in a manner similar to adding point locations. Here I've simply
-made a polygon from the made-up database (Figure 3). You would have a separate database
+made a polygon from the made-up database (Figure~\ref{fig:ggmap3}). You would have a separate database
 holding the location for your polygon(s).
 
-
-```{r}
+<<ggmap3,message=FALSE, fig.height=4, fig.cap='A slightly zoomed in map of the Bering Sea, centered on specific coordinate locations with a randomly generated polygon overlay.',dev='png',dpi=300, fig.pos='H',cache=TRUE>>=
 ggmap(bs1)+geom_point(data=locs,aes(long,lat),size=5,color=4)+
     geom_polygon(aes(x = long, y = lat),data = locs,
     colour = NA, fill = "red", alpha = .5)
-```   
+@  
 
-Figure 3: A slightly zoomed in map of the Bering Sea, centered on specific coordinate
-locations with a randomly generated polygon overlay.
 
-**Going deeper into the mapping realm 
-(or the rabbit hole...)**
+\subsection{Going deeper into the mapping realm\\ 
+(or the rabbit hole...)}
 Mapping can get very confusing very quickly depending upon what exactly you want to do,
 how you want to present information, etc. I am focusing on a limited subset of mapping,
 mainly generating maps for quick visualization of data for evaluating spatial components.
@@ -445,7 +439,7 @@ There is a great deal of information on mapping using ggmap be sure to have a lo
 said sometimes you just want a shaded map or outline map minus the labels that are included
 with the Google maps. This can be done as well!
 Lets generate a map of the western Gulf of Alaska.
-```{r}
+<<map1, message=FALSE, fig.height=4, fig.cap='A map of Alaska, based on data from worldHires in the maps package.',cache=TRUE, fig.pos='H',dpi=300,dev='png',cache=TRUE>>=
 library(ggplot2)
 library(maps)
 library(mapdata)
@@ -453,52 +447,72 @@ library(mapproj)
 
 ak<-map_data('worldHires','USA:Alaska')
 ggplot()+geom_polygon(data=ak,aes(long,lat,group=group),fill=8,color="black")
-```
+@
 
-Figure 4: A map of Alaska, based on data from worldHires in the maps package.
 
-Notice that this map doesn't seem quite right (Figure 4), there are two ways to deal
+Notice that this map doesn't seem quite right (Figure~\ref{fig:map1}), there are two ways to deal
 with this one, if you don't need the far western Aleutian Islands you can simply constrain
 the plot (that is the method I will present); two, if you do need the Aleutian Islands then
-use 'world2Hires' as opposed to 'worldHires' for the data source, this centers the map on
+use ``world2Hires" as opposed to 'worldHires' for the data source, this centers the map on
 the Pacific Ocean, but you will then have to deal with latitude and longitude adjustments
-(longitude is no longer negative<-small rabbit hole).
+(longitude is no longer negative $\leftarrow$ small rabbit hole).
 
 Lets return to the map we do want. There are two ways to constrain the data for the
 Aleutians (remove it, or simply constrain the limits of the plot). The first method here
-removes any points that are further west (east?) than 180o. Then you can create a map
-with a light grey fill for the land and a black outline for the coast (Figure 5).
+removes any points that are further west (east?) than 180$^o$. Then you can create a map
+with a light grey fill for the land and a black outline for the coast (Figure~\ref{fig:map2}).
 
-```{r}
+<<map2, message=FALSE, fig.height=5, fig.cap='ggplot2 map of Alaska based upon worldHires data.',cache=TRUE, fig.pos='H',dpi=300,dev='png',cache=TRUE>>=
 ak<-map_data('worldHires','USA:Alaska')
-ak<-subset(ak,long<0) #drop the end of the Aleutian Islands,can use world2Hires if need these locations
-
+ak<-subset(ak,long<0) #drop the end of the Aleutian Islands, or use world2Hires 
 akmap<-ggplot()+geom_polygon(data=ak,aes(long,lat,group=group),fill=8,color="black")
 akmap
-```
-Figure 5: ggplot map of Alaska based upon worldHires data.
+@
+
 
 Or we can simply constrain the data for the map if we are only interested in a particular
-area of Alaska. We can also clean the map up while zooming into a particular areas (Figure 6),
+area of Alaska. We can also clean the map up while zooming into a particular areas (Figure~\ref{fig:map3}),
 in this case the western Gulf of Alaska. Note that the code to zoom in is not simply done by
-changing the x and y limits. When you constrain the x and y limits on ggplot it throws out
-any data outside of the image, therefore the polygon shapes ("groups") will not be complete
-and the image will not be pretty. To achieve this with this plot I've incorporated the limits in
-a projection wrapper (coord map), there are a number of different projections
+changing the x and y limits. When you constrain the x and y limits in ggplot it throws out
+any data outside of the image, therefore the polygon shapes (``groups") will not be complete
+and the image will not be pretty. In this plot I've incorporated the limits in
+a projection wrapper (coord\_map), there are a number of different projections
 that you can use though this will lead to a BIG rabbit hole!
 I've added a background color (aliceblue) as well as incorporated degree symbols into the
 x- and y-axis labels. Data points and polygons can now be added as additional layers as
 shown earlier.
-```{r}
+<<map3, message=FALSE, fig.height=4, fig.cap='ggplot2 map of Alaska based upon worldHires data all dressed up with color.',cache=TRUE, fig.pos='H',dpi=300,dev='png',cache=TRUE>>=
 ak<-map_data('worldHires','USA:Alaska')
-akmap<-ggplot()+geom_polygon(data=ak,aes(long,lat,group=group),fill=8,color="black")+
+ggplot()+geom_polygon(data=ak,aes(long,lat,group=group),fill=8,color="black")+
     theme(panel.background=element_rect(fill='aliceblue'))+
     xlab(expression(paste(Longitude^o,~'W')))+
     ylab(expression(paste(Latitude^o,~'N')))+
     coord_map(xlim = c(-165, -145),ylim = c(54, 61))
 
-akmap
-```
 
-Figure 6: Zoomed in ggplot map of the western Gulf of Alaska based upon worldHires data.
+@
+
+ Figure~\ref{fig:map4} is the same map without color (better for reports, etc.).
+<<map4,message=FALSE, fig.height=4, fig.cap='Zoomed in ggplot map of the western Gulf of Alaska based upon worldHires data.',dpi=300,dev='png',cache=TRUE, fig.pos='H',dpi=300,dev='png',cache=TRUE>>=
+ggplot()+geom_polygon(data=ak,aes(long,lat,group=group),fill=8,color='black') +
+   theme(panel.background=element_rect(fill='white')) + 
+   xlab(expression(paste(Longitude^o,~'W'))) +
+   ylab(expression(paste(Latitude^o,~'W')))+
+    coord_map(xlim = c(-165, -145),ylim = c(54, 61)) 
+@
+
+\subsection{Bathymetry}
+
+library(marmap)
+
+#  Download data from the server
+getNOAA.bathy(lon1=-175,lon2=-156,lat1=53,lat2=66, resolution=1) -> AKBath
+#  Plot bathy data
+plot(AKBath, image=T,xlim=c(-175,-156), ylim=c(53,66),las=1)
+#  Ghetto low res AK map
+map('worldHires',fill=T,xlim=c(-175,-156), ylim=c(53,66),add=T, col=8)
+# Scale bar
+scaleBathy(AKBath, deg=2, x="topleft", inset=5)
+\end{document}
+
 
