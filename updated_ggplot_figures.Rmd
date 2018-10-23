@@ -437,7 +437,11 @@ ggplot() +
   geom_polygon(data = ak, aes(long, lat, group = group), fill = 8, color = "black") +
   coord_map("gilbert")
 ```
-##5.3 Bathymetry - In progress...
+## 5.3 Have shapefile - will map
+
+
+
+##5.4 Bathymetry - In progress...
 
 ```{r, eval=F}
 library(marmap)
