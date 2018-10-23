@@ -438,7 +438,50 @@ ggplot() +
   coord_map("gilbert")
 ```
 ## 5.3 Have shapefile - will map
+The federal EEZ shapefile is available here https://github.com/ben-williams/excellent_figures/tree/master/shpfiles
 
+This will require using `rgdal` and `rgeos` to manipulate the shapefile into a dataframe available for using in `ggplot2`. I've also used `ggrepel` as a great way to adjust labels in figures. 
+
+```{r}
+library(PBSmapping)
+library(tidyverse)
+library(ggrepel)
+library(rgeos)
+library(rgdal)
+
+# load the shapefile
+areas <- readOGR("shpfiles", layer = "NMFS_GOA_WGS1984")
+areas@data$id = rownames(areas@data)
+areas.points = fortify(areas, region="id")
+areas.df = left_join(areas.points, areas@data, by="id")
+
+#load PBSmapping data set for N Pacific - much better resolution than world highres...
+data('nepacLLhigh') 
+nepacLLhigh %>% 
+  dplyr::select(group=PID, POS=POS,long=X,lat=Y) -> ak 
+
+ports <- data.frame(long = c(-152.433333, -160.493333, -162.318056, -165.775), 
+                    lat = c(57.787, 55.336667, 55.072222, 54.1325), 
+                    port = c("Kodiak", "Sand Point", "King Cove", "Akutan"))
+
+
+
+ggplot() +
+  geom_polygon(data=ak, aes(long, lat, group=group), fill="lightgray", color="lightgray") + 
+  coord_map("gilbert", xlim = c(-170, -145), ylim = c(49, 62)) +
+  xlab(expression(paste(Longitude^o, ~'W'))) +
+  ylab(expression(paste(Latitude^o, ~'N'))) +
+  geom_path(data=areas.df, aes(long, lat, group = group)) +
+  geom_text_repel(data = ports, aes(long, lat, label = port, group = port), point.padding = 1.27, direction = "y") +
+  annotate("text", x = -165, y = 51.5, label = "Area \n 610") +
+  annotate("text", x = -157, y = 53, label = "Area \n 620") +
+  annotate("text", x = -151, y = 55, label = "Area \n 630") +
+  annotate("text", x = -146, y = 57.2, label = "Area \n 640") +
+  annotate("text", x = -167, y = 57.5, label = "Bering Sea") +
+  annotate("text", x = -159, y = 60.5, label = "Alaska") +
+  annotate("text", x = -150, y = 51, label = "Gulf of Alaska") +
+  theme_bw()
+```
 
 
 ##5.4 Bathymetry - In progress...
