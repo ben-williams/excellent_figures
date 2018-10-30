@@ -313,11 +313,11 @@ no idea how to operate most of them. I do know a couple of easy ways to generate
 images though, they are presented below. There are easy methods, that involve call a Google map
 location by name in `ggmap`. This needs an internet connection...
 For this example I have called for a map of the Bering Sea, with a zoom of "4"
-(zoom needs to be an integer from 3 (continent) to 21 (building); more info here). An example is presented here, but I don't utilize these maps, they won't be accepted for publication, so I'll show some other options.
+(zoom needs to be an integer from 3 (continent) to 21 (building); more info here https://journal.r-project.org/archive/2013-1/kahle-wickham.pdf). An example is presented here, but I don't utilize these maps, they won't be accepted for publication, so I'll show some other options.
 
-```{r map, eval=F}
+```{r map, eval=T, fig.cap='Figure 18. A map of the Bering Sea, centered on specific coordinate locations.'}
 library(ggmap)
-bs <- get_map(location = "Bering Sea", zoom = 4)
+bs <- get_map(location = c(-170,63), zoom = 4)
 ggmap(bs)
 ```
 
@@ -331,13 +331,13 @@ named them locs - you would have a separate dataframe with longitude and latitud
 in it.}
 
 First call the map.
-```{r ggmap1, message=FALSE, fig.height=4, fig.cap='Figure 19. A slightly zoomed in map of the Bering Sea, centered on specific coordinate locations.',dev='png',dpi=300, fig.pos='H',cache=F, warning=F, eval = F}
+```{r ggmap1, message=FALSE, fig.height=4, fig.cap='Figure 19. A slightly zoomed in map of the Bering Sea, centered on specific coordinate locations.',dev='png',dpi=300, fig.pos='H',cache=F, warning=F, eval = T}
 bs1 <- get_map(location = c(-170,63), zoom = 6)
 ggmap(bs1)
 ```
 
-Next add points to the map (Figure 19).
-```{r ggmap2, message=FALSE, fig.height=4, fig.cap='Figure 20 A slightly zoomed in map of the Bering Sea, centered on specific coordinate locations with randomly generated points overlayed.',dev='png',dpi=300, fig.pos='H', cache=F, warning=F, eval = F}
+Next add points to the map (Figure 20).
+```{r ggmap2, message=FALSE, fig.height=4, fig.cap='Figure 20 A slightly zoomed in map of the Bering Sea, centered on specific coordinate locations with randomly generated points overlayed.',dev='png',dpi=300, fig.pos='H', cache=F, warning=F, eval = T}
 locs <- data.frame(long=c(-172,-173,-170,-170.5,-170.52), lat=c(62.1,62.2,62.3,63,65))
 
 ggmap(bs1) + 
@@ -348,7 +348,7 @@ Polygons can be easily added in a manner similar to adding point locations. Here
 made a polygon from the made-up database (Figure 21). You would have a separate database
 holding the location for your polygon(s).
 
-```{r ggmap3,message=FALSE, fig.height=4, fig.cap='Figure 21. A slightly zoomed in map of the Bering Sea, centered on specific coordinate locations with a randomly generated polygon overlay.',dev='png',dpi=300, fig.pos='H',cache=F, warning=F, eval = F}
+```{r ggmap3,message=FALSE, fig.height=4, fig.cap='Figure 21. A slightly zoomed in map of the Bering Sea, centered on specific coordinate locations with a randomly generated polygon overlay.',dev='png',dpi=300, fig.pos='H',cache=F, warning=F, eval = T}
 ggmap(bs1) + geom_point(data=locs, aes(long,lat), size=5, color=4) +
     geom_polygon(aes(x = long, y = lat), data = locs,
     colour = NA, fill = "red", alpha = .5)
@@ -363,23 +363,18 @@ mainly generating maps for quick visualization of data for evaluating spatial co
 There is a great deal of information on mapping using ggmap be sure to have a look. That
 said sometimes you just want a shaded map or outline map minus the labels that are included
 with the Google maps. This can be done as well!
-Lets generate a map of the western Gulf of Alaska.
+Let us generate a map of the western Gulf of Alaska.
 
 ```{r map1, fig.height=4, fig.cap="Figure 22. A map of Alaska, based on data from PBSmapping package."}
 library(ggplot2)
-library(PBSmapping)
-
-data('nepacLLhigh') #load PBSmapping data set for N Pacific - much better resolution than world highres...
-
-nepacLLhigh %>% 
-  select(group=PID, POS=POS,long=X, lat=Y) -> ak
-
+library(mapdata)
+ak <- map_data('worldHires','USA:Alaska')
 ggplot() + geom_polygon(data=ak, aes(long, lat, group=group), fill=8, color="black")
 ```
 
 
-Notice that this map doesn't seem quite right (Figure 22), there are two ways to deal
-with this one, if you don't need the far western Aleutian Islands you can simply constrain
+Notice that this map doesn't seem quite right (Figure 22), there are a few ways to deal
+with this, if you don't need the far western Aleutian Islands you can simply constrain
 the plot (that is the method I will present); two, if you do need the Aleutian Islands then
 use "world2Hires" as opposed to 'worldHires' for the data source, this centers the map on
 the Pacific Ocean, but you will then have to deal with latitude and longitude adjustments
@@ -390,11 +385,10 @@ Aleutians (remove it, or simply constrain the limits of the plot). The first met
 removes any points that are further west (east?) than 180$^o$. Then you can create a map
 with a light grey fill for the land and a black outline for the coast (Figure 23).
 
-```{r map2, message=FALSE, fig.height=5, fig.cap='Figure 23. ggplot2 map of Alaska based upon worldHires data.', eval = F}
+```{r map2, message=FALSE, fig.height=5, fig.cap='Figure 23. ggplot2 map of Alaska based upon worldHires data.', eval = T}
 ak <- map_data('worldHires','USA:Alaska')
 ak <- subset(ak, long<0) #drop the end of the Aleutian Islands, or use world2Hires 
-akmap <- ggplot() + geom_polygon(data=ak, aes(long, lat, group=group), fill=8, color="black")
-akmap
+ggplot() + geom_polygon(data=ak, aes(long, lat, group=group), fill=8, color="black")
 ```
 
 
@@ -409,7 +403,7 @@ that you can use though this will lead to a BIG rabbit hole!
 I've added a background color (aliceblue) as well as incorporated degree symbols into the
 x- and y-axis labels. Data points and polygons can now be added as additional layers as
 shown earlier.
-```{r map3, message=FALSE, fig.height=4, fig.cap='Figure 24. ggplot2 map of Alaska based upon PBSmapping data all dressed up with color.', fig.pos='H',dpi=300,dev='png', eval = T}
+```{r map3, message=FALSE, fig.height=4, fig.cap='Figure 24. ggplot2 map of Alaska all dressed up with color.', fig.pos='H',dpi=300,dev='png', eval = T}
 
 ggplot() + 
   geom_polygon(data = ak, aes(long, lat, group=group), fill = 8, color="black") +
@@ -429,14 +423,31 @@ ggplot() +
     coord_map(xlim = c(-165, -145),ylim = c(54, 61)) 
 ```
 
+ Figure 26 is the same map without color but based upon a different base map layer. `PBSmapping` has a better defined coastline than the `worldHires` database.
+```{r mappbs,message=FALSE, fig.height=4, fig.cap='Figure 26. Zoomed in ggplot map of the western Gulf of Alaska based upon PBSmapping data.',dpi=300,dev='png', fig.pos='H'}
+library(PBSmapping)
+library(tidyverse)
+data('nepacLLhigh') 
+nepacLLhigh %>% 
+  dplyr::select(group=PID, POS=POS,long=X,lat=Y) -> ak 
+
+ggplot() + 
+  geom_polygon(data = ak, aes(long, lat, group = group), fill=8, color='black') +
+   theme(panel.background = element_rect(fill = 'white')) + 
+   xlab(expression(paste(Longitude^o,~'W'))) +
+   ylab(expression(paste(Latitude^o,~'W')))+
+    coord_map(xlim = c(-165, -145),ylim = c(54, 61)) 
+```
+
 So you don't like the projection do you? Well change it using "+ coord_map()". There are loads of different projections that can be used, here I show "gilbert", but there are plenty more. Look at page 4 here for various types https://cran.r-project.org/web/packages/mapproj/mapproj.pdf. 
 
-```{r map5, message=FALSE, fig.height=5, fig.cap='Figure 26. ggplot2 map of Alaska based upon PBSmapping data with a "Gilbert" projection', eval = T}
+```{r map5, message=FALSE, fig.height=5, fig.cap='Figure 27. ggplot2 map of Alaska based upon PBSmapping data with a "Gilbert" projection', eval = T}
 
 ggplot() + 
   geom_polygon(data = ak, aes(long, lat, group = group), fill = 8, color = "black") +
   coord_map("gilbert")
 ```
+
 ## 5.3 Have shapefile - will map
 The federal EEZ shapefile is available here https://github.com/ben-williams/excellent_figures/tree/master/shpfiles
 
